@@ -36,14 +36,15 @@ function App() {
   };
 
   // Function to execute commands
-  const handleButtonClick = () => {
+  const handleButtonClick = (e) => {
+    e.preventDefault()
     const commandActions = {
       F: () => moveForward(),
       B: () => moveBackward(),
       L: () => turnLeft(),
       R: () => turnRight(),
     };
-  
+
     const moveForward = () => {
       const move = moves[direction];
       const newX = x + move.x;
@@ -53,7 +54,7 @@ function App() {
         y = normalizeCoordinate(newY);
       }
     };
-  
+
     const moveBackward = () => {
       const oppositeDirection = (directions.indexOf(direction) + 2) % 4;
       const move = moves[directions[oppositeDirection]];
@@ -64,17 +65,18 @@ function App() {
         y = normalizeCoordinate(newY);
       }
     };
-  
+
     const turnLeft = () => {
       direction = directions[(directions.indexOf(direction) + 3) % 4];
     };
-  
+
     const turnRight = () => {
       direction = directions[(directions.indexOf(direction) + 1) % 4];
     };
-  
-    const normalizeCoordinate = (coord) => (coord < 0 ? 50 + coord : coord % 50);
-  
+
+    const normalizeCoordinate = (coord) =>
+      coord < 0 ? 50 + coord : coord % 50;
+
     const executeCommand = (cmd) => {
       const action = commandActions[cmd];
       if (action) {
@@ -83,13 +85,13 @@ function App() {
         console.log(`Invalid command: ${cmd}`);
       }
     };
-  
+
     let x = parseInt(initialPosition.x);
     let y = parseInt(initialPosition.y);
     let direction = initialDirection;
-  
+
     command.trim().toUpperCase().split("").forEach(executeCommand);
-  
+
     setRoverPosition({ x, y });
     setCurrentCoordinates(`Current coordinates: (${x}, ${y}) ${direction}`);
   };
@@ -109,14 +111,14 @@ function App() {
 
   return (
     <div className="App container-fluid">
-      <div id="controls">
+      <form id="controls" onSubmit={handleButtonClick}>
         <div className="row">
           <div className="col">
             {/* X Position */}
             <label htmlFor="initialX">Enter initial X position:</label>
             <div className="inputBox">
               <input
-                required=""
+                required
                 type="number"
                 id="initialX"
                 name="x"
@@ -130,6 +132,7 @@ function App() {
             <label htmlFor="initialY">Enter initial Y position:</label>
             <div className="inputBox">
               <input
+                required
                 type="number"
                 id="initialY"
                 name="y"
@@ -159,14 +162,20 @@ function App() {
             {/* Command */}
             <label htmlFor="commandInput">Enter commands:</label>
             <div className="inputBox">
-              <input type="text"  id="commandInput"  value={command} onChange={inputOnChange} />
+              <input
+                type="text"
+                id="commandInput"
+                required
+                value={command}
+                onChange={inputOnChange}
+              />
             </div>
           </div>
           <div className="col">
             {" "}
             {/* Start Button */}
             <div className="box">
-              <button className="button" onClick={handleButtonClick}>
+              <button className="button" type="submit">
                 START
               </button>
               <div className="space">
@@ -183,7 +192,7 @@ function App() {
         </div>
         <p>{currentCoordinates && currentCoordinates}</p>
         <p>{obstaclesDetected && obstaclesDetected}</p>
-      </div>
+      </form>
       <div id="grid">
         <div
           id="rover"
